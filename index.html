@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>RPN Calculator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400..900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-image: url('https://images.unsplash.com/photo-1612421277476-0806cc06e15a?q=80&w=3348&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');
+            background-size: cover;
+            font-family: "Orbitron", sans-serif;
+            font-optical-sizing: auto;
+            font-style: normal;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 90vh;
+            background-color: #f4f4f4;
+        }
+        .calculator {
+            width: 300px;
+            background: #fff;
+            border-radius: 5px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
+            overflow: hidden;
+        }
+        .calculator .display {
+            background: #222;
+            color: #fff;
+            padding: 10px;
+            text-align: right;
+            height: 50px;
+            font-family: "Orbitron", sans-serif;
+            font-optical-sizing: auto;
+            font-style: normal;
+            width: 94%;
+            border: 0px solid #000;
+            font-size: 30px;
+        }
+        .calculator .keys {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0px;
+        }
+        .calculator .key {
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            background: #f4f4f4;
+            
+            transition: background 0.2s;
+        }
+        .calculator .key:hover {
+            background: #e4e4e4;
+        }
+        .calculator .key.operator {
+            background: #f9a825;
+            color: #fff;
+        }
+        .calculator .key.operator:hover {
+            background: #f57f17;
+        }
+        .calculator .key.space {
+            grid-column: span 1;
+        }
+        .calculator .key.copy {
+            grid-column: span 3;
+            background: #fff;
+        }
+        .calculator .key.copy:hover {
+            background: #fff;
+            cursor: auto !important;
+        }
+    </style>
+</head>
+<body>
+    <div style="color: #fff; width: 400px; padding-right: 20px;">
+        <h1>The Ultimate RPN Calculator Tool</h1>
+        <p style="opacity: 0.9; font-family: Arial, Helvetica, sans-serif; line-height: 24px">Unlock the power of Reverse Polish Notation (RPN) with our state-of-the-art calculator. </p>
+        <p style="opacity: 0.9; font-family: Arial, Helvetica, sans-serif; line-height: 24px">Perfect For:</p>
+        <ul style="opacity: 0.9; font-family: Arial, Helvetica, sans-serif; line-height: 24px">
+            <li>Engineers and Scientists</li>
+            <li>Students and Educators</li>
+            <li>Finance Professionals</li>
+        </ul>
+    </div>
+    <div class="calculator">
+        <input type="text" class="display" readonly="readonly" id="display">
+        <div class="keys">
+            <div class="key" onclick="appendNumber('7')">7</div>
+            <div class="key" onclick="appendNumber('8')">8</div>
+            <div class="key" onclick="appendNumber('9')">9</div>
+            <div class="key operator" onclick="appendOperator('/')">/</div>
+
+            <div class="key" onclick="appendNumber('4')">4</div>
+            <div class="key" onclick="appendNumber('5')">5</div>
+            <div class="key" onclick="appendNumber('6')">6</div>
+            <div class="key operator" onclick="appendOperator('*')">*</div>
+
+            <div class="key" onclick="appendNumber('1')">1</div>
+            <div class="key" onclick="appendNumber('2')">2</div>
+            <div class="key" onclick="appendNumber('3')">3</div>
+            <div class="key operator" onclick="appendOperator('-')">-</div>
+
+            <div class="key" onclick="appendNumber('0')">0</div>
+            <div class="key" onclick="appendNumber('.')">.</div>
+            <div class="key operator" onclick="appendOperator('+')">+</div>
+            <div class="key operator" onclick="calculate()">=</div>
+
+            <div class="key operator" onclick="appendOperator('sqrt')">√</div>
+            <div class="key operator" onclick="appendOperator('^')">^</div>
+            <div class="key operator" onclick="appendOperator('!')">!</div>
+            <div class="key operator" style="background-color: red" onclick="clearDisplay()">C</div>
+            <div class="key space" style="font-size: small" onclick="appendSpace()">SPACE</div>
+            <div class="key copy"><small style="font-size: 10px; opacity: .6;">&copy; 2024 &middot; SCRUM Team</small></div>
+        </div>
+    </div>
+
+    <script>
+        function appendNumber(number) {
+            document.getElementById('display').value += number;
+        }
+
+        function appendOperator(operator) {
+            document.getElementById('display').value += operator;
+        }
+
+        function appendSpace() {
+            document.getElementById('display').value += ' ';
+        }
+
+        function clearDisplay() {
+            document.getElementById('display').value = '';
+        }
+
+        function calculate() {
+            const expression = document.getElementById('display').value.trim();
+            fetch('rpn_calculator.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: 'expression=' + encodeURIComponent(expression)
+            })
+            .then(response => response.text())
+            .then(result => {
+                document.getElementById('display').value = result;
+            });
+        }
+
+        document.addEventListener('keydown', function(event) {
+            const key = event.key;
+            if (!isNaN(key)) {
+                appendNumber(key);
+            } else if (['+', '-', '*', '/', '^'].includes(key)) {
+                appendOperator(key);
+            } else if (key === ' ') {
+                appendSpace();
+            } else if (key === 'Enter') {
+                event.preventDefault(); // Prevent form submission
+                calculate();
+            } else if (key === 'Backspace') {
+                clearDisplay();
+            } else if (key === 's') { // assuming 's' for sqrt
+                appendOperator('sqrt');
+            } else if (key === '!') {
+                appendOperator('!');
+            }
+        });
+        
+    </script>
+</body>
+</html>

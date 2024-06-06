@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RPN Calculator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: "Space Mono", monospace;
+            font-weight: 400;
+            font-style: normal;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 90vh;
+            background-image: url('https://th.bing.com/th/id/OIP.kyaRp9PhBQGIQuQgqyGLnwAAAA?rs=1&pid=ImgDetMain');
+        }
+        #calculator {
+            background-color: #292626;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgb(0 0 0 / 77%);
+        }
+        input[type="text"] {
+            font-family: "Space Mono", monospace;
+            background-color: black;
+            color: #fff;
+            border: 0px solid #000;
+            padding: 10px 10px;
+            border-radius: 5px;
+            width: 93%;
+            text-align: center;
+        }
+        input[type="submit"] {
+            font-family: "Space Mono", monospace;
+            background-color: #d07b1c;
+            border: 0px solid #fff;
+            padding: 10px 20px;
+            border-radius: 5px;
+            margin-top: 10px;
+            color: #fff;
+            width: 100%;
+            font-weight: bold;
+        }
+        input[type="submit"]:hover {
+            background-color: #96560c;
+            color: #000;
+            cursor: pointer;       
+        }
+        #result {
+            margin-top: 10px;
+            font-weight: bold;
+            color: #fff;
+        }
+        .header {
+            color: #fff;
+            margin-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, .1);
+            padding-bottom: 19px;
+        }
+        .header small {
+            opacity: .6;
+        }
+    </style>
+</head>
+<body>
+    <div id="calculator">
+        <form id="rpnForm">
+            <div class="header">
+                <img src="https://th.bing.com/th/id/R.f761cea9231eb933f392ae8d6eee693f?rik=DlWZ4IowLJ%2bfsw&riu=http%3a%2f%2fimg3.wikia.nocookie.net%2f__cb20120828100224%2flogopedia%2fimages%2fd%2fdb%2fCasio.png&ehk=33lqqK2DBb7l74KH20p%2f6R%2b95dlAcBCreVFalL7ehYM%3d&risl=&pid=ImgRaw&r=0" alt="CASIO" style="max-width: 100px;"> <br><br>
+                <b>RPN Calculator</b> <br>
+                <small>Enter expression and see the result.</small>
+            </div>
+            <div>
+                <input type="text" id="expression" name="expression" placeholder="Enter RPN Expression" required>
+            </div>
+            <div>
+                <input type="submit" value="Calculate">
+            </div>
+        </form>
+        <div id="result"></div>
+    </div>
+
+    <script>
+        document.getElementById('rpnForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            let expression = document.getElementById('expression').value;
+            let xhr = new XMLHttpRequest();
+            xhr.open('POST', 'rpn_calculator.php', true);
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            xhr.onload = function () {
+                if (xhr.status === 200) {
+                    if (xhr.responseText.startsWith("Error:")) {
+                        document.getElementById('result').innerText = xhr.responseText;
+                    } else {
+                        document.getElementById('result').innerText = 'Result: ' + xhr.responseText;
+                    }
+                } else {
+                    document.getElementById('result').innerText = 'Error: ' + xhr.status;
+                }
+            };
+            xhr.send('expression=' + encodeURIComponent(expression));
+        });
+    </script>
+</body>
+</html>

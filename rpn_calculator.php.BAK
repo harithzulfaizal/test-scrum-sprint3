@@ -1,0 +1,45 @@
+<?php
+function evaluateRPN($expression) {
+    $stack = [];
+    $tokens = explode(' ', $expression);
+
+    foreach ($tokens as $token) {
+        if (is_numeric($token)) {
+            array_push($stack, $token);
+        } else {
+            if (count($stack) < 2) {
+                return "Error: Invalid Expression";
+            }
+            $b = array_pop($stack);
+            $a = array_pop($stack);
+            switch ($token) {
+                case '+':
+                    array_push($stack, $a + $b);
+                    break;
+                case '-':
+                    array_push($stack, $a - $b);
+                    break;
+                case '*':
+                    array_push($stack, $a * $b);
+                    break;
+                case '/':
+                    if ($b == 0) {
+                        return "Error: Division by Zero";
+                    }
+                    array_push($stack, $a / $b);
+                    break;
+                default:
+                    return "Error: Invalid Operator";
+            }
+        }
+    }
+
+    return count($stack) == 1 ? array_pop($stack) : "Error: Invalid Expression";
+}
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $expression = $_POST['expression'];
+    $result = evaluateRPN($expression);
+    echo $result;
+}
+?>
